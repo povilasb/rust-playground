@@ -41,6 +41,21 @@ impl Tree {
             last_node.set_right(Node::new(right.unwrap(), self.last_index));
         }
     }
+
+    pub fn to_string(self) -> String {
+        inorder_traverse("".to_string(), &self.root)
+    }
+}
+
+fn inorder_traverse(mut acc: String, node: &Node) -> String {
+    if node.left.is_some() {
+        acc = inorder_traverse(acc, node.left.as_ref().unwrap());
+    }
+    acc = acc + &node.value.to_string() + " ";
+    if node.right.is_some() {
+        acc = inorder_traverse(acc, node.right.as_ref().unwrap());
+    }
+    acc
 }
 
 fn node_by_index(node: &mut Node, index: usize) -> Option<&mut Node> {
