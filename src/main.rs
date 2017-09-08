@@ -20,13 +20,9 @@ fn main() {
 
 fn read_indexes() -> Vec<Option<u64>> {
     read_numbers().iter()
-        .map(|n: &i64| {
-            if *n < 0i64 {
-                None
-            }
-            else {
-                Some(*n as u64)
-            }
+        .map(|n: &i64| match *n {
+            n if n < 0i64 => None,
+            _ => Some(*n as u64),
         })
         .collect()
 }
