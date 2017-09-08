@@ -8,11 +8,19 @@ use tree::Tree;
 fn main() {
     let mut t = Tree::new();
     t.append(Some(2), Some(3), 1);
-    t.append(Some(4), None, 2);
-    t.append(Some(5), None, 3);
-    println!("{}", t.to_string());
+    t.append(None, Some(4), 2);
+    t.append(None, Some(5), 3);
 
-    swap_children_at_depth(&mut t, 2);
+    swap_children_at_divisable(&mut t, 2);
+}
+
+fn swap_children_at_divisable(t: &mut Tree, depth: usize) {
+    for d in 1..t.depth() {
+        if d % depth == 0 {
+            swap_children_at_depth(t, d);
+            println!("{}", t.to_string());
+        }
+    }
 }
 
 fn swap_children_at_depth(t: &mut Tree, depth: usize) {
