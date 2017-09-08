@@ -42,7 +42,7 @@ impl Tree {
         }
     }
 
-    pub fn to_string(self) -> String {
+    pub fn to_string(&self) -> String {
         inorder_traverse("".to_string(), &self.root)
     }
 }
