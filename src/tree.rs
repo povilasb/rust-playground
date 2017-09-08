@@ -1,5 +1,6 @@
 use std::mem;
 use std::cmp::max;
+use std::fmt;
 
 #[derive(Debug)]
 pub struct Node {
@@ -49,11 +50,6 @@ impl Tree {
         }
     }
 
-    // TODO: implement ToString trait?
-    pub fn to_string(&self) -> String {
-        inorder_traverse("".to_string(), &self.root)
-    }
-
     pub fn nodes_at_depth(&mut self, depth: usize) -> Vec<&mut Node> {
         let mut res_nodes: Vec<&mut Node> = Vec::new();
         nodes_by_depth(&mut self.root, depth, 1, &mut res_nodes);
@@ -62,6 +58,12 @@ impl Tree {
 
     pub fn depth(&self) -> usize {
         tree_depth(&self.root, 1)
+    }
+}
+
+impl fmt::Display for Tree {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", inorder_traverse("".to_string(), &self.root))
     }
 }
 

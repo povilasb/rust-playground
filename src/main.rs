@@ -26,7 +26,7 @@ fn main() {
 
     for depth in swap_at {
         swap_children_at_divisable(&mut t, depth);
-        println!("{}", t.to_string());
+        println!("{}", t);
     }
 }
 
