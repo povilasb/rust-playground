@@ -12,9 +12,13 @@ fn main() {
     t.append(Some(5), None, 3);
     println!("{}", t.to_string());
 
-    let indexes = read_indexes();
-    for n in indexes {
-        println!("{:?}", n);
+    swap_children_at_depth(&mut t, 2);
+}
+
+fn swap_children_at_depth(t: &mut Tree, depth: usize) {
+    let nodes = t.nodes_at_depth(depth);
+    for n in nodes {
+        n.swap_children();
     }
 }
 

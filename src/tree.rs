@@ -1,8 +1,10 @@
+use std::mem;
+
 #[derive(Debug)]
-struct Node {
-    left: Option<Box<Node>>,
-    right: Option<Box<Node>>,
-    value: u64,
+pub struct Node {
+    pub left: Option<Box<Node>>,
+    pub right: Option<Box<Node>>,
+    pub value: u64,
     index: usize,
 }
 
@@ -17,6 +19,10 @@ impl Node {
 
     fn set_right(&mut self, node: Node) {
         self.right = Some(Box::new(node));
+    }
+
+    pub fn swap_children(&mut self) {
+        mem::swap(&mut self.left, &mut self.right);
     }
 }
 
@@ -42,8 +48,28 @@ impl Tree {
         }
     }
 
+    // TODO: implement ToString trait?
     pub fn to_string(&self) -> String {
         inorder_traverse("".to_string(), &self.root)
+    }
+
+    pub fn nodes_at_depth(&mut self, depth: usize) -> Vec<&mut Node> {
+        let mut res_nodes: Vec<&mut Node> = Vec::new();
+        nodes_by_depth(&mut self.root, depth, 1, &mut res_nodes);
+        res_nodes
+    }
+}
+
+fn nodes_by_depth<'a>(node: &'a mut Node, depth: usize, curr_depth: usize, res_nodes: &mut Vec<&'a mut Node>) {
+    if curr_depth == depth {
+        res_nodes.push(node);
+        return;
+    }
+    if node.left.is_some() {
+        nodes_by_depth(node.left.as_mut().unwrap(), depth, curr_depth + 1, res_nodes);
+    }
+    if node.right.is_some() {
+        nodes_by_depth(node.right.as_mut().unwrap(), depth, curr_depth + 1, res_nodes);
     }
 }
 
@@ -134,6 +160,19 @@ mod tests {
             t.append(Some(4), None, 2);
 
             assert_that!(t.root.left.as_ref().unwrap().left.as_ref().unwrap().value, is(equal_to(4)));
+        }
+
+        #[test]
+        fn nodes_at_depth_return_all_nodes_with_specified_depth() {
+            let mut t = Tree::new();
+            t.append(Some(2), Some(3), 1);
+            t.append(Some(4), None, 2);
+            t.append(Some(5), None, 3);
+
+            let nodes = t.nodes_at_depth(3);
+            assert_that!(nodes.len(), is(equal_to(2)));
+            assert_that!(nodes[0].value, is(equal_to(4)));
+            assert_that!(nodes[1].value, is(equal_to(5)));
         }
     }
 
