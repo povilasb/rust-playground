@@ -1,4 +1,5 @@
 use std::mem;
+use std::cmp::max;
 
 #[derive(Debug)]
 pub struct Node {
@@ -58,6 +59,22 @@ impl Tree {
         nodes_by_depth(&mut self.root, depth, 1, &mut res_nodes);
         res_nodes
     }
+
+    pub fn depth(&self) -> usize {
+        tree_depth(&self.root, 1)
+    }
+}
+
+fn tree_depth(node: &Node, curr_depth: usize) -> usize {
+    let left_depth = match node.left {
+        Some(ref lnode) => tree_depth(lnode, curr_depth + 1),
+        None => curr_depth,
+    };
+    let right_depth = match node.right {
+        Some(ref rnode) => tree_depth(rnode, curr_depth + 1),
+        None => curr_depth,
+    };
+    max(left_depth, right_depth)
 }
 
 fn nodes_by_depth<'a>(node: &'a mut Node, depth: usize, curr_depth: usize, res_nodes: &mut Vec<&'a mut Node>) {
@@ -173,6 +190,15 @@ mod tests {
             assert_that!(nodes.len(), is(equal_to(2)));
             assert_that!(nodes[0].value, is(equal_to(4)));
             assert_that!(nodes[1].value, is(equal_to(5)));
+        }
+
+        #[test]
+        fn depth_returns_max_tree_depth() {
+            let mut t = Tree::new();
+            t.append(Some(2), Some(3), 1);
+            t.append(Some(4), None, 2);
+
+            assert_that!(t.depth(), is(equal_to(3)));
         }
     }
 
