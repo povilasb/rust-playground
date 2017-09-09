@@ -1,59 +1,93 @@
 #[cfg(test)] #[macro_use] extern crate hamcrest;
 
+use std::io;
+use std::str::FromStr;
+use std::fmt::Debug;
+
 struct Queue<T: Copy> {
-    value: T,
-    next: Option<Box<Queue<T>>>,
+    values: Vec<T>,
 }
 
 impl <T: Copy> Queue<T> {
-    fn new(value: T) -> Queue<T> {
+    fn new(size: usize) -> Queue<T> {
         Queue {
-            value,
-            next: None,
+            values: Vec::with_capacity(size),
         }
     }
 
     fn append(&mut self, value: T) {
-        append_node(self, Box::new(Queue::new(value)));
+        self.values.push(value);
+    }
+
+    fn iter(&self) -> QueueIterator<T> {
+        QueueIterator {
+            queue: self,
+            curr_item: 0,
+        }
     }
 }
 
-fn append_node<T: Copy>(queue: &mut Queue<T>, node: Box<Queue<T>>) {
-    if queue.next.is_some() {
-        append_node(queue.next.as_mut().unwrap(), node);
-    } else {
-        queue.next = Some(node);
-    }
-}
 
 struct QueueIterator<'a, T: Copy + 'a> {
-    root_item: &'a Queue<T>,
-    curr_item: &'a mut Queue<T>,
+    queue: &'a Queue<T>,
+    curr_item: usize,
 }
 
 impl <'a, T: Copy> Iterator for QueueIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        /*
-        match self.curr_item.next {
-            Some(ref mut next_item) => self.curr_item = next_item,
-            None => (),
+        if self.curr_item > self.queue.values.len() - 1 {
+            self.curr_item = 0;
         }
-        */
-        None
+        let res = Some(self.queue.values[self.curr_item]);
+        self.curr_item += 1;
+        res
     }
 }
 
 
 fn main() {
-    let mut q = Queue::new(1);
-    q.append(2);
-    q.append(3);
+    let pump_count = read_numbers::<usize>()[0];
+    let mut remaining_fuel: Queue<i64> = Queue::new(pump_count);
 
-    let mut curr_item = q.next.as_ref().unwrap();
-    curr_item = curr_item.next.as_ref().unwrap();
-    println!("{}", curr_item.value);
+    let mut tank_volume = 0i64;
+    for _ in 0..pump_count {
+        let stop = read_numbers::<i64>();
+        tank_volume = tank_volume + (stop[0] - stop[1]);
+        remaining_fuel.append(tank_volume);
+    }
+
+    let mut start_pos = 0;
+    for i in (0..remaining_fuel.values.len()).rev() {
+        if remaining_fuel.values[i] < 0 {
+            start_pos = i + 1;
+            break;
+        }
+    }
+
+    println!("{}", pos);
+}
+
+fn read_numbers<T>() -> Vec<T>
+where
+    T: FromStr,
+    T::Err: Debug
+{
+    match readln() {
+        Ok(ln) => {
+            ln.split_whitespace()
+                .map(|s| s.parse::<T>().unwrap())
+                .collect()
+        },
+        Err(_) => Vec::new(),
+    }
+}
+
+fn readln() -> io::Result<String> {
+    let mut ln = String::new();
+    io::stdin().read_line(&mut ln)?;
+    Ok(String::from(ln.trim()))
 }
 
 
@@ -66,20 +100,5 @@ mod tests {
     mod queue {
         use super::*;
 
-        #[test]
-        fn new_returns_queue_with_specified_item() {
-            let q = Queue::new(10);
-
-            assert_that!(q.value, is(equal_to(10)));
-        }
-
-        #[test]
-        fn append_sets_next_queue_item() {
-            let mut q = Queue::new(1);
-
-            q.append(2);
-
-            assert_that!(q.next.unwrap().value, is(equal_to(2)));
-        }
     }
 }
