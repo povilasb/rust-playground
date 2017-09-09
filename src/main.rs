@@ -25,6 +25,17 @@ impl <T: Copy> Queue<T> {
             curr_item: 0,
         }
     }
+
+    fn iter_at(&self, start: usize) -> QueueIterator<T> {
+        QueueIterator {
+            queue: self,
+            curr_item: start,
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.values.len()
+    }
 }
 
 
@@ -46,27 +57,37 @@ impl <'a, T: Copy> Iterator for QueueIterator<'a, T> {
     }
 }
 
-
 fn main() {
     let pump_count = read_numbers::<usize>()[0];
-    let mut remaining_fuel: Queue<i64> = Queue::new(pump_count);
+    let mut pumps: Queue<(i64, i64)> = Queue::new(pump_count);
 
     let mut tank_volume = 0i64;
     for _ in 0..pump_count {
         let stop = read_numbers::<i64>();
-        tank_volume = tank_volume + (stop[0] - stop[1]);
-        remaining_fuel.append(tank_volume);
+        pumps.append((stop[0], stop[1]));
     }
+    println!("{}", start_trip_at(&pumps));
+}
 
-    let mut start_pos = 0;
-    for i in (0..remaining_fuel.values.len()).rev() {
-        if remaining_fuel.values[i] < 0 {
-            start_pos = i + 1;
-            break;
+fn start_trip_at(pumps: &Queue<(i64, i64)>) -> usize {
+    for station in 0..pumps.len() {
+        match gas_after_trip_at(&pumps, station) {
+            Some(gas) => return station,
+            None => (),
         }
     }
+    0
+}
 
-    println!("{}", pos);
+fn gas_after_trip_at(pumps: &Queue<(i64, i64)>, station: usize) -> Option<i64> {
+    let mut gas = 0i64;
+    for p in pumps.iter_at(station).take(pumps.len()) {
+        gas = gas + p.0 - p.1;
+        if gas < 0 {
+            return None;
+        }
+    }
+    Some(gas)
 }
 
 fn read_numbers<T>() -> Vec<T>
