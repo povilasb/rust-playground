@@ -29,10 +29,7 @@ impl FileInput {
         T: FromStr,
         T::Err: Debug
     {
-        match self.readln() {
-            Ok(ln) => Ok(ln.parse::<T>().unwrap()),
-            Err(e) => Err(e),
-        }
+        Ok(self.readln()?.parse::<T>().unwrap())
     }
 
     /// Tries to read multiple numbers in one file.
