@@ -9,7 +9,7 @@ use std::fmt::{self, Display};
 use rand;
 
 pub struct Request {
-    code: u32,
+    pub code: u32,
 }
 
 impl Request {

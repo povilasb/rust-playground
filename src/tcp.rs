@@ -98,15 +98,22 @@ pub mod async {
             self.read_request(&mut client)
         }
 
-        fn read_request(&self, client: &mut TcpStream) {
+        fn read_request(&self, mut client: &mut TcpStream) {
             let mut buf = [0u8; 4096];
             let bytes_read = client.read(&mut buf)
                 .expect("! Failed to read data from client.");
 
             match proto::Request::from_bytes(&buf[0..bytes_read]) {
-                Some(req) => println!("> Request: {}", req),
+                Some(req) => self.on_request(&req, &mut client),
                 None => println!("! Failed to parse request."),
             }
+        }
+
+        fn on_request(&self, req: &proto::Request, client: &mut TcpStream) {
+            println!("> Request: {}", req);
+
+            let resp = proto::Response::new(req.code as usize);
+            client.write(&resp.into_bytes()[..]);
         }
     }
 }
