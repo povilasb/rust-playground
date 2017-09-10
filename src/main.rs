@@ -34,7 +34,8 @@ impl Server {
     }
 
     fn respond_to_client(&self, client: &mut net::TcpStream) {
-        client.write(&"echo".to_string().into_bytes()[..]);
+        let resp = proto::Response::new(3);
+        client.write(&resp.into_bytes()[..]);
     }
 }
 

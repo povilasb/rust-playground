@@ -8,20 +8,20 @@ use rand;
 
 type AddressList = Vec<SocketAddr>;
 
-struct Response {
+pub struct Response {
     // Length = x, each SocketAddr is a random IP and a random port.
     addr: AddressList,
 }
 
 impl Response {
     // TODO: support IPv6 too.
-    fn new(addr_count: usize) -> Response {
+    pub fn new(addr_count: usize) -> Response {
         Response {
             addr: random_addrsv4(addr_count),
         }
     }
 
-    fn from_bytes(data: &[u8]) -> Option<Response> {
+    pub fn from_bytes(data: &[u8]) -> Option<Response> {
         // TODO
         None
     }
@@ -30,7 +30,7 @@ impl Response {
     // robust (de)serialization.
     /// Serializes addresses to bytes where first two bytes is the number
     /// of addresses then every other 6 bytes is an address.
-    fn into_bytes(&self) -> Vec<u8> {
+    pub fn into_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(2 + self.addr.len() * 6);
         bytes.extend(big_endian::u16_to_bytes(self.addr.len() as u16).iter());
         // sloooow...
