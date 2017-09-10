@@ -1,3 +1,6 @@
+extern crate rand;
+#[cfg(test)] #[macro_use] extern crate hamcrest;
+
 use std::io::Read;
 use std::net;
 

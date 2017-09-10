@@ -4,3 +4,7 @@ version = "0.1.0"
 authors = ["Povilas Balciunas <balciunas90@gmail.com>"]
 
 [dependencies]
+rand = "0.3.16"
+
+[dev-dependencies]
+hamcrest = "*"
