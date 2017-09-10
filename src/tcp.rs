@@ -44,6 +44,8 @@ pub mod async {
     use mio::*;
     use mio::tcp::{TcpListener, TcpStream};
 
+    use proto;
+
     const SERVER: Token = Token(0);
 
     // TODO: implement server trait. UDP or other transport protocol servers
@@ -101,10 +103,10 @@ pub mod async {
             let bytes_read = client.read(&mut buf)
                 .expect("! Failed to read data from client.");
 
-            let request = String::from_utf8(buf.to_vec())
-                .expect("! Invalid request.");
-
-            println!("> Request: {}", request);
+            match proto::Request::from_bytes(&buf[0..bytes_read]) {
+                Some(req) => println!("> Request: {}", req),
+                None => println!("! Failed to parse request."),
+            }
         }
     }
 }

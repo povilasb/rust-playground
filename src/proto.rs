@@ -4,7 +4,37 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::str::FromStr;
 
+use std::fmt::{self, Display};
+
 use rand;
+
+pub struct Request {
+    code: u32,
+}
+
+impl Request {
+    pub fn new(code: u32) -> Request {
+        Request { code }
+    }
+
+    // TODO: use Result instead
+    pub fn from_bytes(bytes: &[u8]) -> Option<Request> {
+        let req = match String::from_utf8(bytes.to_vec()) {
+            Ok(req) => req,
+            Err(_) => return None,
+        };
+        match req.parse::<u32>() {
+            Ok(code) => Some(Request::new(code)),
+            Err(_) => None,
+        }
+    }
+}
+
+impl fmt::Display for Request {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.code.to_string())
+    }
+}
 
 type AddressList = Vec<SocketAddr>;
 
