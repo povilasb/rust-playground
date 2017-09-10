@@ -1,9 +1,10 @@
 extern crate rand;
 #[cfg(test)] #[macro_use] extern crate hamcrest;
 
-use std::io::Read;
+use std::io::{Read, Write};
 use std::net;
 
+mod proto;
 
 struct Server {
     listener: net::TcpListener,
@@ -29,6 +30,11 @@ impl Server {
         let bytes_read = client.read(&mut buf)
             .expect("Failed to read data from client");
         println!("{}", bytes_read);
+        self.respond_to_client(&mut client);
+    }
+
+    fn respond_to_client(&self, client: &mut net::TcpStream) {
+        client.write(&"echo".to_string().into_bytes()[..]);
     }
 }
 
