@@ -35,3 +35,58 @@ impl Server {
         client.write(&resp.into_bytes()[..]);
     }
 }
+
+pub mod async {
+    use mio::*;
+    use mio::tcp::{TcpListener, TcpStream};
+    use std::str::FromStr;
+    use std::net::SocketAddr;
+
+    const SERVER: Token = Token(0);
+
+    // TODO: implement server trait. UDP or other transport protocol servers
+    // could be implemented in the future.
+    pub struct Server {
+        listener: TcpListener,
+        poll: Poll,
+    }
+
+    impl Server {
+        pub fn new(addr: &str) -> Server {
+            let addr = SocketAddr::from_str(addr).unwrap();
+            Server {
+                listener: TcpListener::bind(&addr).unwrap(),
+                poll: Poll::new().unwrap(),
+            }
+        }
+
+        pub fn run(&self) {
+            self.poll.register(
+                &self.listener,
+                SERVER,
+                Ready::readable(),
+                PollOpt::edge()
+            ).unwrap();
+
+            let mut events = Events::with_capacity(1024);
+            loop {
+                self.poll.poll(&mut events, None).unwrap();
+                self.on_event(&mut events);
+            }
+        }
+
+        fn on_event(&self, events: &mut Events) {
+            for event in events.iter() {
+                match event.token() {
+                    SERVER => self.on_new_connection(),
+                    _ => unreachable!(),
+                }
+            }
+        }
+
+        fn on_new_connection(&self) {
+            let client = self.listener.accept();
+            println!("{}", "client connected");
+        }
+    }
+}
