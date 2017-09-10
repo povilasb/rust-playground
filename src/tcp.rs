@@ -37,10 +37,12 @@ impl Server {
 }
 
 pub mod async {
-    use mio::*;
-    use mio::tcp::{TcpListener, TcpStream};
     use std::str::FromStr;
     use std::net::SocketAddr;
+    use std::io::{Read, Write};
+
+    use mio::*;
+    use mio::tcp::{TcpListener, TcpStream};
 
     const SERVER: Token = Token(0);
 
@@ -85,8 +87,24 @@ pub mod async {
         }
 
         fn on_new_connection(&self) {
-            let client = self.listener.accept();
-            println!("{}", "client connected");
+            // TODO: handle errors.
+            let (mut client, addr) = self.listener.accept().unwrap();
+            println!("> Client connected: {}", addr);
+            // TODO: register client on event loop. It just happens that
+            // on localhost when client is connected it's already
+            // ready to be read from.
+            self.read_request(&mut client)
+        }
+
+        fn read_request(&self, client: &mut TcpStream) {
+            let mut buf = [0u8; 4096];
+            let bytes_read = client.read(&mut buf)
+                .expect("! Failed to read data from client.");
+
+            let request = String::from_utf8(buf.to_vec())
+                .expect("! Invalid request.");
+
+            println!("> Request: {}", request);
         }
     }
 }
