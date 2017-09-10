@@ -4,7 +4,7 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::str::FromStr;
 
-use std::fmt::{self, Display};
+use std::fmt;
 
 use rand;
 
