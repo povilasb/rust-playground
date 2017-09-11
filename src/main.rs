@@ -65,7 +65,7 @@ fn main() {
 fn process_query(heap: &mut MinHeap, query: &Query) {
     match query[0] {
         1 => heap.push(query[1]),
-        3 => println!("{}", heap.items.iter().min().unwrap()),
+        3 => println!("{}", heap.items[0]),
         2 => heap.remove(query[1]),
         _ => panic!("Unknown query `{}`", query[0]),
     }
