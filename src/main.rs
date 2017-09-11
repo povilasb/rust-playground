@@ -24,9 +24,10 @@ impl MinHeap {
     }
 
     fn remove(&mut self, item: i64) {
-        match self.items.iter().enumerate().find(|&(_, val)| *val == item) {
-            Some((pos, _)) => self.items.remove(pos),
-            None => 0,
+        if let Some((pos, _)) = self.items.iter()
+                                          .enumerate()
+                                          .find(|&(_, val)| *val == item) {
+            self.items.remove(pos);
         };
     }
 }
