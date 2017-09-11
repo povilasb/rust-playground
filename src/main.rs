@@ -27,8 +27,32 @@ impl MinHeap {
         if let Some((pos, _)) = self.items.iter()
                                           .enumerate()
                                           .find(|&(_, val)| *val == item) {
-            self.items.remove(pos);
+            let last_element = self.items.len() - 1;
+            self.items.swap(pos, last_element);
+            self.items.remove(last_element);
+            if self.items.len() > 1 {
+                reorder_after_remove(&mut self.items, pos);
+            }
         };
+    }
+}
+
+fn reorder_after_remove(items: &mut Vec<i64>, item_pos: usize) {
+    let lcpos = lchild_pos(item_pos);
+    let rcpos = lcpos + 1;
+    let last_element = items.len() - 1;
+
+    let mut smaller_item_pos = item_pos;
+    if lcpos < last_element && items[lcpos] < items[item_pos] {
+        smaller_item_pos = lcpos;
+    }
+    if rcpos < last_element && items[rcpos] < items[smaller_item_pos] {
+        smaller_item_pos = rcpos;
+    }
+
+    if smaller_item_pos != item_pos {
+        items.swap(item_pos, smaller_item_pos);
+        reorder_after_remove(items, smaller_item_pos);
     }
 }
 
@@ -49,6 +73,11 @@ fn parent_pos(child_pos: usize) -> Option<usize> {
         0 => None,
         _ => Some((child_pos - 1) / 2),
     }
+}
+
+/// Left child position. Right child position is +1.
+fn lchild_pos(item_pos: usize) -> usize {
+    item_pos * 2 + 1
 }
 
 type Query = Vec<i64>;
