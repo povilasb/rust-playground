@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 use std::ops::Fn;
 use std::cmp::{max, min};
 
@@ -12,42 +12,72 @@ fn main() {
     let edge_count = read_numbers::<usize>()[0];
     for _ in 0..edge_count {
         let edge = read_numbers::<u32>();
-        sets.add(&edge[..]);
+        // TODO: why?
+        if edge.len() > 0 {
+            sets.add(&edge[..]);
+        }
     }
 
+    println!("{:?}", sets.sets);
     println!("{} {}", sets.min_set_len(), sets.max_set_len());
 }
 
 struct DisjointSets {
-    sets: Vec<HashSet<u32>>,
+    sets: HashMap<u32, usize>,
+    next_list: usize,
 }
 
 impl DisjointSets {
     fn new() -> DisjointSets {
         DisjointSets {
-            sets: Vec::new(),
+            sets: HashMap::new(),
+            next_list: 0,
         }
     }
 
     fn add(&mut self, edge: &[u32]) {
-        let set: HashSet<u32> = edge.iter().cloned().collect();
-        self.sets.push(set);
-
-        let rm_pos = split_vec(&mut self.sets, |ref s| contains_any(&s, edge));
-        let new_set = {
-            let join_sets = self.sets.drain(rm_pos..);
-            join_sets.fold(HashSet::new(), |s1, s2| &s1 | &s2)
+       // TODO: don't clone - how?
+       let set_indices = (self.sets.get(&edge[0]).cloned(),
+                          self.sets.get(&edge[1]).cloned());
+       match set_indices {
+            (None, None) => {
+                self.sets.insert(edge[0], self.next_list);
+                self.sets.insert(edge[1], self.next_list);
+                self.next_list += 1;
+            },
+            (None, Some(set_index)) => {
+                self.sets.insert(edge[0], set_index);
+            },
+            (Some(set_index), None) => {
+                self.sets.insert(edge[1], set_index);
+            },
+            (Some(set1), Some(set2)) => {
+                for (k, v) in self.sets.iter_mut()
+                                       .filter(|&(_, ref s)| *s == &set2) {
+                    *v = set1;
+                }
+                self.next_list += 1;
+            },
+            _ => (),
         };
-        self.sets.push(new_set);
     }
 
     fn max_set_len(&self) -> usize {
-        self.sets.iter().fold(0, |max_len, set| max(max_len, set.len()))
+        let mut max_len = 0;
+        for seti in self.sets.values() {
+            max_len = max(max_len,
+                          self.sets.values().filter(|&s| s == seti).count());
+        }
+        max_len
     }
 
     fn min_set_len(&self) -> usize {
-        self.sets.iter().skip(1)
-            .fold(self.sets[0].len(), |min_len, set| min(min_len, set.len()))
+        let mut min_len = 65535;
+        for seti in self.sets.values() {
+            min_len = min(min_len,
+                          self.sets.values().filter(|&s| s == seti).count());
+        }
+        min_len
     }
 }
 
