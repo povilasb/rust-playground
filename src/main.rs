@@ -1,6 +1,4 @@
-use std::collections::{HashSet, HashMap};
-use std::ops::Fn;
-use std::cmp::{max, min};
+use std::collections::HashMap;
 
 mod stdio;
 use stdio::read_numbers;
@@ -60,7 +58,7 @@ impl DisjointSets {
             (Some(set1), Some(set2)) => {
                 if set1 != set2 {
                     let mut set_increase = 0;
-                    for (k, v) in self.sets.iter_mut()
+                    for (_, v) in self.sets.iter_mut()
                                            .filter(|&(_, ref s)| *s == &set2) {
                         *v = set1;
                         set_increase += 1;
@@ -73,7 +71,6 @@ impl DisjointSets {
                     self.next_list += 1;
                 }
             },
-            _ => (),
         };
     }
 
@@ -83,84 +80,5 @@ impl DisjointSets {
 
     fn min_set_len(&self) -> usize {
         *self.set_sizes.values().min().unwrap_or(&0)
-    }
-}
-
-fn split_vec<T, F>(vec: &mut Vec<T>, when: F) -> usize
-        where F: Fn(&T) -> bool {
-    let mut lpos = 0;
-    let mut rpos = vec.len() - 1;
-
-    'outer: while lpos < rpos {
-        if when(&vec[lpos]) {
-            while when(&vec[rpos]) {
-                if rpos == lpos {
-                    break 'outer;
-                }
-                rpos -= 1;
-            }
-
-            vec.swap(lpos, rpos);
-        }
-
-        lpos += 1;
-    }
-    lpos
-}
-
-fn contains_any(set: &HashSet<u32>, values: &[u32]) -> bool {
-    values.iter().any(|val| set.contains(val))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    macro_rules! set {
-        ( $( $x:expr ),* ) => {
-            {
-                let mut temp_set = HashSet::new();
-                $(
-                    temp_set.insert($x);
-                )*
-                temp_set
-            }
-        };
-    }
-
-    mod contains_any {
-        use super::*;
-
-        #[test]
-        fn it_returns_true_when_at_least_one_value_is_not_present_in_set() {
-            let all = contains_any(&set![1, 2, 3], &[1, 4]);
-
-            assert!(all == true);
-        }
-    }
-
-    mod disjoint_sets {
-        use super::*;
-
-        #[test]
-        fn add_inserts_disjoint_tuples_as_separate_sets() {
-            let mut sets = DisjointSets::new();
-
-            sets.add(&[1, 6]);
-            sets.add(&[2, 7]);
-
-            assert!(sets.sets[0] == set![1, 6]);
-            assert!(sets.sets[1] == set![2, 7]);
-        }
-
-        #[test]
-        fn add_inserts_to_existing_set_when_theres_joining_element() {
-            let mut sets = DisjointSets::new();
-
-            sets.add(&[1, 6]);
-            sets.add(&[2, 6]);
-
-            assert!(sets.sets[0] == set![1, 6, 2]);
-        }
     }
 }
