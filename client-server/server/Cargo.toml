@@ -1,0 +1,11 @@
+[package]
+name = "client-server"
+version = "0.1.0"
+authors = ["Povilas Balciunas <balciunas90@gmail.com>"]
+
+[dependencies]
+rand = "0.3.16"
+mio = "0.6.10"
+
+[dev-dependencies]
+hamcrest = "*"
