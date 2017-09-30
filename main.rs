@@ -1,4 +1,5 @@
 use std::io::{self};
+use std::cmp;
 
 struct Operation {
     a: usize,
@@ -22,20 +23,21 @@ fn main() {
         let abk = read_numbers();
         ops.push(Operation::new(abk[0], abk[1], abk[2] as u64));
     }
-    println!("{}", "ops constructed");
 
-    let mut arr = vec![0; n];
+    let mut arr = vec![0; n + 1];
 
     for op in ops {
-        apply_op(&mut arr, &op);
+        arr[op.a] += op.k;
+        arr[op.b + 1] -= op.k;
     }
-    println!("{}", arr.iter().max().unwrap());
-}
 
-fn apply_op(arr: &mut Vec<u64>, op: &Operation) {
-    for i in op.a..op.b + 1 {
-        arr[i] += op.k;
+    let mut max = 0;
+    let mut sum = 0;
+    for n in arr {
+        sum += n;
+        max = cmp::max(sum, max);
     }
+    println!("{}", max);
 }
 
 fn read_numbers() -> Vec<usize> {
