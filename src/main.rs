@@ -34,7 +34,8 @@ fn main() {
     let mut curr_str = "".to_string();
 
     for _ in 0..op_count {
-        match read_operation().unwrap() {
+        let op = read_operation().unwrap();
+        match op {
             Operation::Append(word) => {
                 curr_str.push_str(&word[..]);
                 operations.push(Operation::Delete(word.len()));
