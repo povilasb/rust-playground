@@ -1,0 +1,6 @@
+[package]
+name = "quicksort1"
+version = "0.1.0"
+authors = ["Povilas Balciunas <balciunas90@gmail.com>"]
+
+[dependencies]
