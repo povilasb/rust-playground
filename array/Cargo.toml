@@ -1,0 +1,13 @@
+[package]
+name = "rust-array"
+version = "0.1.0"
+authors = ["Povilas Balciunas <balciunas90@gmail.com>"]
+
+[dependencies]
+
+[[bin]]
+name = "rust-array"
+path = "main.rs"
+
+[profile.release]
+# debug = true
