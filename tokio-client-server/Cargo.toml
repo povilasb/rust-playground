@@ -1,0 +1,9 @@
+[package]
+authors = ["Povilas Balciunas <balciunas90@gmail.com>"]
+name = "client-server"
+version = "0.1.0"
+
+[dependencies]
+futures = "0.1.16"
+tokio-core = "0.1.10"
+unwrap = "1.1.0"
