@@ -1,7 +1,9 @@
 use std::fs::File;
-use std::io::{self, BufReader, BufRead, Write};
+use std::io::{self, BufReader, BufRead};
 use std::str::FromStr;
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
+
+mod fio;
 
 /// File reader with convenient API.
 struct FileInput {
@@ -49,19 +51,6 @@ impl FileInput {
     }
 }
 
-fn write_to_file(fname: &str, num: u64) -> io::Result<()> {
-    let mut f = File::create(fname)?;
-    write!(&mut f, "{}", num);
-    Ok(())
-}
-
-fn writeln_to<T: Display>(fname: &str, data: T) -> io::Result<()> {
-    let mut f = File::create(fname)?;
-    write!(&mut f, "{}\n", data);
-    Ok(())
-}
-
-
 fn main() {
     let mut fin = FileInput::open("nums.txt");
     println!("{}", fin.read_number::<u32>().unwrap());
@@ -69,6 +58,6 @@ fn main() {
         println!("{}", n);
     }
 
-    write_to_file("out.txt", 5);
-    writeln_to("out.txt", "works:)".to_string());
+    fio::write_to_file("out.txt", 5);
+    fio::writeln_to("out.txt", "works:)".to_string());
 }
