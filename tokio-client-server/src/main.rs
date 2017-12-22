@@ -13,13 +13,14 @@ use futures::Stream;
 
 fn main() {
     let mut core = unwrap!(Core::new());
+    let handle = core.handle();
 
     let listener = unwrap!(TcpListener::bind(
         &unwrap!("0.0.0.0:5000".parse()),
         &core.handle(),
     ));
     let accept_conns = listener.incoming().for_each(|(client, addr)| {
-        core.handle().spawn_fn(|| {
+        handle.spawn_fn(move || {
             on_connected(client, addr);
             Ok(())
         });
@@ -29,7 +30,7 @@ fn main() {
     unwrap!(core.run(accept_conns));
 }
 
-fn on_connected(client: TcpStream, addr: SocketAddr) {
+fn on_connected(_client: TcpStream, addr: SocketAddr) {
     println!("Connected: {}", addr);
     thread::sleep(time::Duration::from_secs(5));
 }
