@@ -1,0 +1,10 @@
+[package]
+authors = ["Povilas Balciunas <balciunas90@gmail.com>"]
+name = "tcp-keepalive"
+version = "0.1.0"
+
+[dependencies]
+libc = "0.2.44"
+mio = "0.6.16"
+net-literals = "0.1.2"
+unwrap = "1.2.1"
